@@ -7,6 +7,7 @@ mod control;
 mod core_bin;
 mod files;
 mod hc;
+mod identity;
 mod keys;
 mod layout;
 mod layout_sync;
@@ -59,6 +60,8 @@ window closes. `hc --help`: start, read, wait on and talk to terminals and
 agents. The app shows them and arranges them in spaces and tabs.
 
 Home: ~/.config/herdr-app (HERDR_APP_HOME picks another).
+Beside another Herdr: HERDR_APP_NAME titles the window, HERDR_APP_ID gives it
+its own taskbar button, HERDR_APP_ICON its own icon (Windows, an .ico).
 ";
 
 /// A Windows window app has no console: answers to `herdr-app ls` and the
@@ -190,6 +193,7 @@ fn main() {
             if let Some(tx) = mods::request_sender() {
                 control::listen(tx);
             }
+            identity::init(cx);
             match core {
                 Ok(core) => open_main(core, requests, cx),
                 Err(need) => setup::open(need, requests, cx),
@@ -206,7 +210,7 @@ pub fn open_main(core: std::sync::Arc<hc::Core>, requests: async_channel::Receiv
                 // macOS: always see-through, so a layout can draw its own title bar
                 // live; the app drags the window (window/titlebar.rs).
                 titlebar: Some(TitlebarOptions {
-                    title: Some("Herdr".into()),
+                    title: Some(identity::name()),
                     // Windows: hidden for good (it can't change live); the app draws it.
                     appears_transparent: cfg!(any(target_os = "macos", windows)),
                     traffic_light_position: cfg!(target_os = "macos").then(|| point(px(12.0), px(7.0))),
@@ -217,10 +221,13 @@ pub fn open_main(core: std::sync::Arc<hc::Core>, requests: async_channel::Receiv
                 // it to 20x20; turning it on later (a "system" layout) is fine.
                 window_decorations: Some(WindowDecorations::Client),
                 // Herdr Dev and other side-by-side builds get their own dock icon.
-                app_id: Some(std::env::var("HERDR_APP_ID").ok().filter(|s| !s.is_empty()).unwrap_or_else(|| "herdr-app".into())),
+                app_id: Some(identity::app_id()),
                 ..Default::default()
             };
-            cx.open_window(options, |window, cx| cx.new(|cx| window::AppWindow::new(core, requests, window, cx)))
-                .expect("cannot open the Herdr window");
+            cx.open_window(options, |window, cx| {
+                identity::dress(window);
+                cx.new(|cx| window::AppWindow::new(core, requests, window, cx))
+            })
+            .expect("cannot open the Herdr window");
             cx.activate(true);
 }
