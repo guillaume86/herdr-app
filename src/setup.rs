@@ -77,12 +77,15 @@ pub fn open(need: Need, requests: async_channel::Receiver<Request>, cx: &mut App
     let options = WindowOptions {
         window_bounds: Some(WindowBounds::Windowed(Bounds::centered(None, size(px(620.0), px(460.0)), cx))),
         titlebar: Some(TitlebarOptions { title: Some("Herdr".into()), ..Default::default() }),
-        app_id: Some("herdr-app".into()),
+        app_id: Some(crate::identity::app_id()),
         ..Default::default()
     };
     let icon = Arc::new(Image::from_bytes(ImageFormat::Png, ICON.to_vec()));
-    cx.open_window(options, |_, cx| cx.new(|_| Setup { need, state: State::Ready, requests: Some(requests), icon }))
-        .expect("cannot open the Herdr window");
+    cx.open_window(options, |window, cx| {
+        crate::identity::dress(window);
+        cx.new(|_| Setup { need, state: State::Ready, requests: Some(requests), icon })
+    })
+    .expect("cannot open the Herdr window");
     cx.activate(true);
 }
 

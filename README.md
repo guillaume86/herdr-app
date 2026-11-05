@@ -69,6 +69,14 @@ Spaces on that machine run their terminals there, not on your computer.
 Each machine keeps its spaces, tabs and splits in its core. Connected screens share that structure and the live terminals, but keep their own focus and zoom.
 Remote work keeps running when your local window closes or your laptop sleeps, as long as the remote machine and core stay up.
 
+## Run a second Herdr
+
+A second window with its own layouts, settings and terminals needs its own app home and core session:
+set `HERDR_APP_HOME` to another folder and `HC_SESSION` to another name before starting `herdr-app`.
+To tell the two apart, `HERDR_APP_ID` gives it its own taskbar button and a mod can title its window with `setWindowTitle`.
+On Windows, `HERDR_APP_NAME` names it on notifications and `HERDR_APP_ICON` gives it its own icon (an `.ico` file).
+To pin it, pin a shortcut that starts it with these variables and carries the same `HERDR_APP_ID` as its `System.AppUserModel.ID`.
+
 ## Make it yours
 
 Open the command palette to find an action by name, or open Settings to change fonts, colors, sounds and other preferences.
