@@ -680,6 +680,7 @@ export default class Settings extends View {
 
   alerts(t) {
     const macos = window()?.platform === "macos";
+    const windows = window()?.platform === "windows";
     const sounds = this.person.sounds ?? {};
     const on = sounds.enabled !== false;
     const file = (f) => (f ? f.split(/[\\/]/).pop() : "Herdr's sound");
@@ -716,12 +717,14 @@ export default class Settings extends View {
           this.button(t, "st-test-notification", "Send", () => run("app.test_notification")),
         ),
       )
-      .when(macos, (el) =>
+      .when(macos || windows, (el) =>
         el.child(
           this.row(
             t,
-            "Bounce the Dock icon",
-            "When an agent needs you while Herdr is in the background.",
+            macos ? "Bounce the Dock icon" : "Highlight the taskbar button",
+            macos
+              ? "When an agent needs you while Herdr is in the background."
+              : "When an agent needs you while Herdr is in the background. It stays orange until you switch to Herdr.",
             this.toggle(t, "st-dock_bounce", this.person.dock_bounce === true, (_e, cx) =>
               this.change((p) => {
                 if (p.dock_bounce) delete p.dock_bounce;

@@ -42,9 +42,11 @@ export function pickFolder(options?: { prompt?: string }): Promise<string | null
  *  file (absolute, or relative to ~/.config/herdr-app). */
 export function playSound(sound: string): null;
 
-/** Shows `label` on the app's dock icon (macOS; elsewhere nothing yet) until the app quits or
+/** Shows `label` on the app's dock icon (macOS) or taskbar button (Windows, a small red disc:
+ *  two characters at most read, so send "9+" past 9; Linux: nothing yet) until the app quits or
  *  the next call: a string as given, a number as written. 0, "" or null clears it. One badge for
- *  the whole app: the last call from any mod copy wins. */
+ *  the whole app: the last call from any mod copy wins. A minimized window doesn't render, so
+ *  call it from a `cx.timer` too (without `cx.notify()`); a label that didn't change costs nothing. */
 export function setBadge(label: string | number | null): null;
 
 /**

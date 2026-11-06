@@ -229,6 +229,7 @@ pub fn open_main(core: std::sync::Arc<hc::Core>, requests: async_channel::Receiv
             };
             cx.open_window(options, |window, cx| {
                 identity::dress(window);
+                badge::attach(window);
                 cx.new(|cx| window::AppWindow::new(core, requests, window, cx))
             })
             .expect("cannot open the Herdr window");

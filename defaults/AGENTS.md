@@ -669,9 +669,10 @@ What's about the user, never a look:
   and that first alert may not show; Send a test notification in Settings >
   Alerts (`app.test_notification`) asks while the person is there. A build
   not run from an app bundle sends none.
-- `dock_bounce`: `true` bounces the Dock icon (macOS) when an agent needs
-  the person (blocked or stopped on an error) while Herdr is in the
-  background. Off by default.
+- `dock_bounce`: `true` bounces the Dock icon (macOS), or turns the
+  taskbar button orange until the person switches to Herdr (Windows), when
+  an agent needs the person (blocked or stopped on an error) while Herdr is
+  in the background. Off by default.
 - `core`: the herdr-core binary to use, when it isn't where Herdr looks
   (PATH, the login shell's PATH, `~/.local/bin`, Homebrew, mise, Nix,
   cargo). Read at start.
@@ -1001,10 +1002,13 @@ All of it is in `herdr.d.ts`. In short:
   locally and remotely. It rejects on timeout, if the program cannot start or the machine cannot be reached.
   `hc(args)` (`hc read <t>` gives a terminal's text),
   `home()`, `appHome()`, `playSound("done" | "blocked" | file)`.
-  `setBadge(label)`: the dock icon's badge on macOS, e.g. how many agents
+  `setBadge(label)`: the dock icon's badge on macOS, the taskbar button's
+  on Windows (two characters at most read there), e.g. how many agents
   wait; `agents()` has a row per pane, so count addresses:
   `setBadge(new Set(agents().filter((a) => a.status === "blocked").map((a) => a.address)).size)`.
   0, "" or null clears it; one for the whole app, the last call wins.
+  A minimized window doesn't render: call it from a `cx.timer` too
+  (no `cx.notify()` needed), or the badge waits for the window to show.
   `knownAgents({ on })`: the agents people can start (programs.json's
   `run`), most picked first, each `installed` or not there (asked of the
   shell agents start in; a remote Unix machine's login/interactive shell when supported);
