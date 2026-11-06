@@ -776,9 +776,10 @@ What's about the user, never a look:
   and that first alert may not show; Send a test notification in Settings >
   Alerts (`app.test_notification`) asks while the person is there. A build
   not run from an app bundle sends none.
-- `dock_bounce`: `true` bounces the Dock icon (macOS) when an agent needs
-  the person (blocked or stopped on an error) while Herdr is in the
-  background. Off by default.
+- `dock_bounce`: `true` bounces the Dock icon (macOS), or turns the
+  taskbar button orange until the person switches to Herdr (Windows), when
+  an agent needs the person (blocked or stopped on an error) while Herdr is
+  in the background. Off by default.
 - `core`: the herdr-core binary to use, when it isn't where Herdr looks
   (PATH, the login shell's PATH, `~/.local/bin`, Homebrew, mise, Nix,
   cargo). Read at start.
@@ -1288,9 +1289,10 @@ All of it is in `herdr.d.ts`. In short:
 - Window title: `setWindowTitle(title)` sets the OS window's title, which window switchers,
   taskbars and time trackers read. The last call wins; `null` restores `Herdr`. Call it when the
   title changes, not on every render.
-- App icon badge: `setBadge(text)` puts `text` on the app's Dock icon (macOS; other platforms
-  ignore it), e.g. `setBadge(blocked ? String(blocked) : null)`. The last call wins; `null` or `""`
-  clears it.
+- App icon badge: `setBadge(text)` puts `text` on the app's Dock icon (macOS) or, as a small red
+  disc, on its taskbar button (Windows: two characters at most read there, so send "9+" past 9;
+  Linux ignores it), e.g. `setBadge(blocked ? String(blocked) : null)`. The last call wins; `null`
+  or `""` clears it. A minimized window may not render: call it from `cx.timer.every` too.
 - `notify({ ..., action: { name, args } })`: the toast runs the command when clicked.
 - This copy: `props()`, `shared(key)` / `setShared(key, value)` (every mod
   sees it; setting re-renders all), `nextCommand()` (key commands for this
